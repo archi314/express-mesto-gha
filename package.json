@@ -4,7 +4,7 @@
     "mongoose": "^6.5.4"
   },
   "name": "express-mesto-gha",
-  "description": "[![Tests](https://github.com/yandex-praktikum/express-mesto-gha/actions/workflows/tests-13-sprint.yml/badge.svg)](https://github.com/yandex-praktikum/express-mesto-gha/actions/workflows/tests-13-sprint.yml) [![Tests](https://github.com/yandex-praktikum/express-mesto-gha/actions/workflows/tests-14-sprint.yml/badge.svg)](https://github.com/yandex-praktikum/express-mesto-gha/actions/workflows/tests-14-sprint.yml)\r # Проект Mesto фронтенд + бэкенд",
+  "description": "Проект Mesto фронтенд + бэкенд",
   "version": "1.0.0",
   "main": "app.js",
   "devDependencies": {
@@ -14,7 +14,7 @@
     "nodemon": "^2.0.19"
   },
   "scripts": {
-    "prod": "node app.js",
+    "start": "node app.js",
     "dev": "nodemon app.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "npx eslint"

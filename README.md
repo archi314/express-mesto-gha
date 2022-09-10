@@ -1,4 +1,4 @@
-# Проект Mesto фронтенд + бэкендn
+# Проект Mesto фронтенд + бэкенд
 
 [![Tests](https://github.com/yandex-praktikum/express-mesto-gha/actions/workflows/tests-13-sprint.yml/badge.svg)](https://github.com/archi314/express-mesto-gha/actions/workflows/tests-13-sprint.yml/badge.svg)](https://github.com/archi314/express-mesto-gha/actions/workflows/tests-13-sprint.yml)
 [![Tests](https://github.com/yandex-praktikum/express-mesto-gha/actions/workflows/tests-14-sprint.yml/badge.svg)](https://github.com/archi314/express-mesto-gha/actions/workflows/tests-14-sprint.yml/badge.svg)](https://github.com/archi314/express-mesto-gha/actions/workflows/tests-14-sprint.yml)

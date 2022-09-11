@@ -33,9 +33,9 @@ const deleteCard = async (req, res) => {
     } else if (req.user._id !== owner) {
       return res
         .status(401)
-        .send({ message: 'Можно удалять только свои карточки' });
+        .send({ message: 'Вы не можете удалять чужие карточки' });
     }
-    card.remove();
+    await card.remove();
     return res.status(200).send({ message: 'Карточка удалена' });
   } catch (err) {
     if (err.name === 'CastError') {

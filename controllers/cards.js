@@ -27,15 +27,9 @@ const deleteCard = async (req, res) => {
   const { cardId } = req.params;
   try {
     const card = await Card.findByIdAndRemove(cardId);
-    const owner = card.owner.toString();
     if (!card) {
       res.status(404).send({ message: 'Указанной карточки не существует' });
-    } else if (req.user._id !== owner) {
-      return res
-        .status(401)
-        .send({ message: 'Вы не можете удалять чужие карточки' });
     }
-    await card.remove();
     return res.status(200).send({ message: 'Карточка удалена' });
   } catch (err) {
     if (err.name === 'CastError') {

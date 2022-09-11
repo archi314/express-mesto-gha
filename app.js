@@ -21,6 +21,10 @@ app.use(express.json());
 app.use(userRoutes);
 app.use(cardRoutes);
 
+app.use((req, res) => {
+  res.status(404).send({ message: 'Страница не найлена' });
+});
+
 async function main() {
   try {
     await mongoose.connect('mongodb://localhost:27017/mestodb', {

@@ -38,7 +38,7 @@ const deleteCard = async (req, res) => {
     card.remove();
     return res.status(200).send({ message: 'Карточка удалена' });
   } catch (err) {
-    if (err.name === 'ObjectId') {
+    if (err.name === 'CastError') {
       return res
         .status(400)
         .send({ message: 'Некорректные данные для удаления карточки' });
@@ -86,7 +86,7 @@ const dislikeCard = async (req, res) => {
     }
     return res.send(card);
   } catch (err) {
-    if (err.name === 'ObjectId') {
+    if (err.name === 'CastError') {
       return res
         .status(400)
         .send({ message: 'Переданы невалидные данные при постановки лайка' });

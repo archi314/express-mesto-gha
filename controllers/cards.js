@@ -26,11 +26,17 @@ const createCard = async (req, res) => {
 const deleteCard = async (req, res) => {
   const { cardId } = req.params;
   try {
-    const card = await Card.findById(cardId);
+    const card = await Card.findByIdAndRemove(cardId);
+    const owner = card.owner.toString();
     if (!card) {
-      return res.status(404).send({ message: 'Указанной карточки не существует' });
+      res.status(404).send({ message: 'Указанной карточки не существует' });
+    } else if (req.user._id !== owner) {
+      return res
+        .status(401)
+        .send({ message: 'Можно удалять только свои карточки' });
     }
-    return res.status(200).send(card);
+    card.remove();
+    return res.status(200).send({ message: 'Карточка удалена' });
   } catch (err) {
     if (err.name === 'ObjectId') {
       return res

@@ -66,11 +66,10 @@ const updateUserProfile = async (req, res) => {
 };
 
 const updateUserAvatar = async (req, res) => {
-  const owner = req.user._id;
   const { avatar } = req.body;
   try {
     const user = await User.findByIdAndUpdate(
-      owner,
+      req.user._id,
       { avatar },
       { new: true, runValidators: true },
     );

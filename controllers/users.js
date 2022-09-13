@@ -6,7 +6,7 @@ const createUser = async (req, res) => {
     res.status(200).send(user);
   } catch (err) {
     if (err.name === 'ValidationError') {
-      res.status(400).send({ message: 'Переданы некорректные данные', ...err });
+      res.status(400).send({ message: 'Переданы невалидные данные', ...err });
     }
     res.status(500).send({ message: 'Ошибка на сервере', ...err });
   }
@@ -36,7 +36,7 @@ const getUserById = async (req, res) => {
     if (err.kind === 'ObjectId') {
       return res
         .status(400)
-        .send({ message: 'Переданы некорректные данные', ...err });
+        .send({ message: 'Переданы невалидные данные', ...err });
     }
     return res.status(500).send({ message: 'Ошибка на сервере', ...err });
   }
@@ -59,7 +59,7 @@ const updateUserProfile = async (req, res) => {
     return res.status(200).send(user);
   } catch (err) {
     if (err.name === 'ValidationError') {
-      return res.status(400).send({ message: 'Переданы некорректные данные' });
+      return res.status(400).send({ message: 'Переданы невалидные данные' });
     }
     return res.status(500).send({ message: 'Ошибка на сервере', ...err });
   }
@@ -83,7 +83,7 @@ const updateUserAvatar = async (req, res) => {
     if (err.name === 'ValidationError') {
       return res
         .status(400)
-        .send({ message: 'Переданы некорректные данные', ...err });
+        .send({ message: 'Переданы невалидные данные', ...err });
     }
     return res.status(500).send({ message: 'Ошибка на сервере', ...err });
   }

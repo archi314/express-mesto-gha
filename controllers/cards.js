@@ -17,7 +17,7 @@ const createCard = async (req, res) => {
     return res.status(200).send(card);
   } catch (err) {
     if (err.name === 'ValidationError') {
-      return res.status(400).send({ message: 'Ошибка в запросе', ...err });
+      return res.status(400).send({ message: 'Переданные данные невалидны', ...err });
     }
     return res.status(500).send({ message: 'Ошибка на сервере', ...err });
   }
@@ -35,7 +35,7 @@ const deleteCard = async (req, res) => {
     if (err.name === 'CastError') {
       return res
         .status(400)
-        .send({ message: 'Некорректные данные для удаления карточки' });
+        .send({ message: 'Переданы невалидные данные для удаления карточки' });
     }
     return res.status(500).send({ message: 'Ошибка на сервере', ...err });
   }

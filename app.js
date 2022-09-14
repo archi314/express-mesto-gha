@@ -6,6 +6,10 @@ const { PORT = 3000 } = process.env;
 const { userRoutes } = require('./routes/users');
 const { cardRoutes } = require('./routes/cards');
 
+const {
+  ErrorNotFound, /** Ошибка 404. */
+} = require('./utils/constants');
+
 const app = express();
 
 app.use((req, res, next) => {
@@ -22,7 +26,7 @@ app.use(userRoutes);
 app.use(cardRoutes);
 
 app.use((req, res) => {
-  res.status(404).send({ message: 'Страница не найлена' });
+  res.status(ErrorNotFound).send({ message: 'Страница не найлена' });
 });
 
 async function main() {

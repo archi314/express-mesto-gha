@@ -67,7 +67,7 @@ const updateUserProfile = async (req, res) => {
     if (err.name === 'ValidationError') {
       return res.status(ErrorBadRequest).send({ message: 'Переданы невалидные данные' });
     }
-    return res.status(ErrorServer).send({ message: 'Ошибка на сервере', ...err });
+    return res.status(ErrorServer).send({ message: 'Ошибка на сервере' });
   }
 };
 
@@ -89,9 +89,9 @@ const updateUserAvatar = async (req, res) => {
     if (err.name === 'ValidationError') {
       return res
         .status(ErrorBadRequest)
-        .send({ message: 'Переданы невалидные данные', ...err });
+        .send({ message: 'Переданы невалидные данные' });
     }
-    return res.status(ErrorServer).send({ message: 'Ошибка на сервере', ...err });
+    return res.status(ErrorServer).send({ message: 'Ошибка на сервере' });
   }
 };
 

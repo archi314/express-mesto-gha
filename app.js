@@ -10,7 +10,6 @@ const { PORT = 3000 } = process.env;
 const { userRoutes } = require('./routes/users');
 const { cardRoutes } = require('./routes/cards');
 
-const errorHandler = require('./errors/error');
 const auth = require('./middlewares/auth');
 
 const {
@@ -32,8 +31,14 @@ app.use((req, res) => {
 });
 
 app.use(auth);
-app.use(errorHandler);
 app.use(errors());
+
+app.use((err, req, res, next) => {
+  const statusCode = err.statusCode || 500;
+  const message = statusCode === 500 ? 'На сервере произошла ошибка' : err.message;
+  res.status(statusCode).send({ message });
+  next();
+});
 
 async function main() {
   try {

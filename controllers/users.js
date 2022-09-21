@@ -42,7 +42,7 @@ const getUsers = async (req, res, next) => {
     const users = await User.find({});
     return res.send(users);
   } catch (err) {
-    return next(ErrorServer('Ошибка на сервере'));
+    return next(new ErrorServer('Ошибка на сервере'));
   }
 };
 
@@ -59,7 +59,7 @@ const getUserById = async (req, res, next) => {
     if (err.kind === 'ObjectId') {
       return next(new ErrorBadRequest('Переданы невалидные данные'));
     }
-    return res.status(ErrorServer).send({ message: 'Ошибка на сервере' });
+    return next(new ErrorServer('Ошибка на сервере'));
   }
 };
 
@@ -109,7 +109,7 @@ const login = async (req, res, next) => {
 
   try {
     const user = await User.findOne({ email }).selected('+password');
-    if (!email || !password) {
+    if (!user) {
       return next(new ErrorUnauthorized('Пользователь c введенным email не существует'));
     }
     const coincidedPassword = await bcrypt.compare(password, user.password);
@@ -125,7 +125,7 @@ const login = async (req, res, next) => {
       httpOnly: true,
       sameSite: true,
     });
-    return res.send(user.toJSON());
+    return res.send(user);
   } catch (err) {
     return next(err);
   }

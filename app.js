@@ -19,6 +19,9 @@ const {
 } = require('./errors/ErrorNotFound');
 
 const app = express();
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(cookieParser());
 
 app.use(express.json());
 
@@ -26,7 +29,7 @@ app.post('/signin', celebrate({
   body: Joi.object().keys({
     name: Joi.string().min(2).max(30),
     about: Joi.string().min(2).max(30),
-    avatar: Joi.string().regex(/^(http|https):\/\/(W{3}\.)?[^]+#?$/),
+    avatar: Joi.string().regex(/^(https?:\/\/)?([\da-z.-]+).([a-z.]{2,6})([/\w.-]*)*\/?$/),
     email: Joi.string().required().email(),
     password: Joi.string().required(),
   }),
@@ -45,10 +48,6 @@ app.use(cardRoutes);
 app.use((req, res) => {
   res.status(ErrorNotFound).send({ message: 'Страница не найлена' });
 });
-
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(cookieParser());
 
 app.use(auth);
 app.use(errorHandler);

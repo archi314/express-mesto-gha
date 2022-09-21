@@ -1,33 +1,52 @@
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 
-const {
-  ErrorBadRequest, /** Ошбика 400. */
-  ErrorNotFound, /** Ошибка 404. */
-  ErrorServer, /** Ошибка 500. */
-} = require('../utils/constants');
+const ErrorBadRequest = require('../errors/ErrorBadRequest'); /** Ошбика 400. */
+const ErrorNotFound = require('../errors/ErrorNotFound'); /** Ошибка 404. */
+const ErrorServer = require('../errors/ErrorServer'); /** Ошибка 500. */
+const ErrorConflict = require('../errors/ErrorConflict'); /** Ошибка 409. */
+const ErrorUnauthorized = require('../errors/ErrorUnauthorized'); /** Ошибка 401. */
 
-const createUser = async (req, res) => {
+const createUser = async (req, res, next) => {
+  const {
+    name,
+    about,
+    avatar,
+    email,
+    password,
+  } = req.body;
   try {
-    const user = await new User(req.body).save();
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const user = await User.create({
+      name,
+      about,
+      avatar,
+      email,
+      password: hashedPassword,
+    });
     return res.send(user);
   } catch (err) {
     if (err.name === 'ValidationError') {
-      res.status(ErrorBadRequest).send({ message: 'Переданы невалидные данные' });
+      return next(new ErrorBadRequest('Переданы невалидные данные'));
     }
-    return res.status(ErrorServer).send({ message: 'Ошибка на сервере' });
+    if (err.code === 11000) {
+      return next(new ErrorConflict('Пользователь с указанным email не найден'));
+    }
+    return next(new ErrorServer('Ошибка на сервере'));
   }
 };
 
-const getUsers = async (req, res) => {
+const getUsers = async (req, res, next) => {
   try {
     const users = await User.find({});
     return res.send(users);
   } catch (err) {
-    return res.status(ErrorServer).send({ message: 'Ошибка на сервере' });
+    return next(ErrorServer('Ошибка на сервере'));
   }
 };
 
-const getUserById = async (req, res) => {
+const getUserById = async (req, res, next) => {
   const { userId } = req.params;
   try {
     const user = await User.findById(userId);
@@ -35,20 +54,16 @@ const getUserById = async (req, res) => {
     if (user) {
       return res.send(user);
     }
-    return res
-      .status(ErrorNotFound)
-      .send({ message: 'Указанный пользователь не найден' });
+    return next(new ErrorNotFound('Указанный пользователь не найден'));
   } catch (err) {
     if (err.kind === 'ObjectId') {
-      return res
-        .status(ErrorBadRequest)
-        .send({ message: 'Переданы невалидные данные' });
+      return next(new ErrorBadRequest('Переданы невалидные данные'));
     }
     return res.status(ErrorServer).send({ message: 'Ошибка на сервере' });
   }
 };
 
-const updateUserProfile = async (req, res) => {
+const updateUserProfile = async (req, res, next) => {
   const { name, about } = req.body;
   const owner = req.user._id;
   try {
@@ -58,20 +73,18 @@ const updateUserProfile = async (req, res) => {
       { new: true, runValidators: true },
     );
     if (!user) {
-      return res
-        .status(ErrorNotFound)
-        .send({ message: 'Указанный ваемый пользователь не найден' });
+      return next(new ErrorNotFound('Указанный ваемый пользователь не найден'));
     }
     return res.send(user);
   } catch (err) {
     if (err.name === 'ValidationError') {
-      return res.status(ErrorBadRequest).send({ message: 'Переданы невалидные данные' });
+      return next(new ErrorBadRequest('Переданы невалидные данные'));
     }
-    return res.status(ErrorServer).send({ message: 'Ошибка на сервере' });
+    return next(new ErrorServer('Ошибка на сервере'));
   }
 };
 
-const updateUserAvatar = async (req, res) => {
+const updateUserAvatar = async (req, res, next) => {
   const { avatar } = req.body;
   try {
     const user = await User.findByIdAndUpdate(
@@ -80,18 +93,41 @@ const updateUserAvatar = async (req, res) => {
       { new: true, runValidators: true },
     );
     if (!user) {
-      return res
-        .status(ErrorNotFound)
-        .send({ message: 'Указанный пользователь не найден' });
+      return next(new ErrorNotFound('Указанный пользователь не найден'));
     }
     return res.send(user);
   } catch (err) {
     if (err.name === 'ValidationError') {
-      return res
-        .status(ErrorBadRequest)
-        .send({ message: 'Переданы невалидные данные' });
+      return next(new ErrorBadRequest('Переданы невалидные данные'));
     }
-    return res.status(ErrorServer).send({ message: 'Ошибка на сервере' });
+    return next(new ErrorServer('Ошибка на сервере'));
+  }
+};
+
+const login = async (req, res, next) => {
+  const { email, password } = req.body;
+
+  try {
+    const user = await User.findOne({ email }).selected('+password');
+    if (!email || !password) {
+      return next(new ErrorUnauthorized('Пользователь c введенным email не существует'));
+    }
+    const coincidedPassword = await bcrypt.compare(password, user.password);
+    if (!coincidedPassword) {
+      return next(new ErrorUnauthorized('Неверно ведена почта или пароль'));
+    }
+    const token = jwt.sign(
+      { _id: user._id },
+      'SECRET',
+    );
+    res.cookie('jwt', token, {
+      maxAge: 3600000,
+      httpOnly: true,
+      sameSite: true,
+    });
+    return res.send(user.toJSON());
+  } catch (err) {
+    return next(err);
   }
 };
 
@@ -101,4 +137,5 @@ module.exports = {
   getUserById,
   updateUserProfile,
   updateUserAvatar,
+  login,
 };

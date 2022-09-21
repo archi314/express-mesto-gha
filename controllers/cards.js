@@ -1,21 +1,20 @@
 const Card = require('../models/card');
 
-const {
-  ErrorBadRequest, /** Ошбика 400. */
-  ErrorNotFound, /** Ошибка 404. */
-  ErrorServer, /** Ошибка 500. */
-} = require('../utils/constants');
+const ErrorBadRequest = require('../errors/ErrorBadRequest'); /** Ошбика 400. */
+const ErrorNotFound = require('../errors/ErrorNotFound'); /** Ошибка 404. */
+const ErrorServer = require('../errors/ErrorServer'); /** Ошибка 500. */
+const ErrorForbidden = require('../errors/ErrorConflict'); /** Ошибка 403. */
 
-const getCards = async (req, res) => {
+const getCards = async (req, res, next) => {
   try {
     const cards = await Card.find({});
     return res.send(cards);
   } catch (err) {
-    return res.status(ErrorServer).send({ message: 'Ошибка на сервере' });
+    return next(new ErrorServer('Ошибка на сервере'));
   }
 };
 
-const createCard = async (req, res) => {
+const createCard = async (req, res, next) => {
   const owner = req.user._id;
   const { name, link } = req.body;
   try {
@@ -23,31 +22,34 @@ const createCard = async (req, res) => {
     return res.send(card);
   } catch (err) {
     if (err.name === 'ValidationError') {
-      return res.status(ErrorBadRequest).send({ message: 'Переданные данные невалидны' });
+      return next(new ErrorBadRequest('Переданные данные невалидны'));
     }
-    return res.status(ErrorServer).send({ message: 'Ошибка на сервере' });
+    return next(new ErrorServer('Ошибка на сервере'));
   }
 };
 
-const deleteCard = async (req, res) => {
+const deleteCard = async (req, res, next) => {
+  const owner = req.user._id;
   const { cardId } = req.params;
   try {
     const card = await Card.findByIdAndRemove(cardId);
     if (!card) {
-      return res.status(ErrorNotFound).send({ message: 'Указанной карточки не существует' });
+      return next(new ErrorNotFound('Указанной карточки не существует'));
     }
+    if (owner !== card.owner.toString()) {
+      return next(new ErrorForbidden('Вы не можете удалить чужую карточку'));
+    }
+    await Card.findByIdAndRemove(cardId);
     return res.send({ message: 'Карточка удалена' });
   } catch (err) {
     if (err.name === 'CastError') {
-      return res
-        .status(ErrorBadRequest)
-        .send({ message: 'Переданы невалидные данные для удаления карточки' });
+      return next(new ErrorBadRequest('Переданы невалидные данные для удаления карточки'));
     }
-    return res.status(ErrorServer).send({ message: 'Ошибка на сервере' });
+    return next(new ErrorServer('Ошибка на сервере'));
   }
 };
 
-const likeCard = async (req, res) => {
+const likeCard = async (req, res, next) => {
   const { cardId } = req.params;
   try {
     const card = await Card.findByIdAndUpdate(
@@ -56,24 +58,18 @@ const likeCard = async (req, res) => {
       { new: true },
     );
     if (!card) {
-      return res
-        .status(ErrorNotFound)
-        .send({ message: 'Передан несуществующий id карточки' });
+      return next(new ErrorNotFound('Передан несуществующий id карточки'));
     }
     return res.send(card);
   } catch (err) {
     if (err.kind === 'ObjectId') {
-      return res
-        .status(ErrorBadRequest)
-        .send({ message: 'Переданы невалидные данные при постановки лайка' });
+      return next(new ErrorBadRequest('Переданы невалидные данные при постановки лайка'));
     }
-    return res
-      .status(ErrorServer)
-      .send({ message: 'Произошла ошибка на сервере' });
+    return next(new ErrorServer('Произошла ошибка на сервере'));
   }
 };
 
-const dislikeCard = async (req, res) => {
+const dislikeCard = async (req, res, next) => {
   const { cardId } = req.params;
   try {
     const card = await Card.findByIdAndUpdate(
@@ -82,18 +78,14 @@ const dislikeCard = async (req, res) => {
       { new: true },
     );
     if (!card) {
-      return res.status(ErrorNotFound).send({ message: 'Указанная карточка не существует' });
+      return next(new ErrorNotFound('Указанная карточка не существует'));
     }
     return res.send(card);
   } catch (err) {
     if (err.name === 'CastError') {
-      return res
-        .status(ErrorBadRequest)
-        .send({ message: 'Переданы невалидные данные при постановки лайка' });
+      return next(new ErrorBadRequest('Переданы невалидные данные при постановки лайка'));
     }
-    return res
-      .status(ErrorServer)
-      .send({ message: 'Произошла ошибка на сервере' });
+    return next(new ErrorServer('Произошла ошибка на сервере'));
   }
 };
 

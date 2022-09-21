@@ -34,7 +34,6 @@ userRoutes.post('/signin', celebrate({
   }),
 }), login);
 
-userRoutes.post('/users', createUser);
 userRoutes.get('/users', getUsers);
 
 userRoutes.get('/users/:userId', celebrate({

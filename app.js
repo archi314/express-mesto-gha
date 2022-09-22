@@ -1,5 +1,6 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const { errors } = require('celebrate');
 const { userRoutes } = require('./routes/users');
@@ -12,6 +13,8 @@ const {
 const { PORT = 3000 } = process.env;
 
 const app = express();
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 app.use(express.json());
@@ -19,7 +22,7 @@ app.use(express.json());
 app.use(userRoutes);
 app.use(cardRoutes);
 
-app.use('*', (req, res, next) => {
+app.use((req, res, next) => {
   next(new ErrorNotFound('Страница не найлена'));
 });
 

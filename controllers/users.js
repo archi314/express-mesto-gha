@@ -46,6 +46,19 @@ const getUsers = async (req, res, next) => {
   }
 };
 
+const getUserInfo = async (req, res, next) => {
+  try {
+    const userId = req.user._id;
+    const user = await User.findById(userId);
+    if (!user) {
+      return next(new ErrorNotFound('Указанный пользователь не найден'));
+    }
+    return res.send(user);
+  } catch (err) {
+    return next(new ErrorServer('Ошибка на сервере'));
+  }
+};
+
 const getUserById = async (req, res, next) => {
   const { userId } = req.params;
   try {
@@ -58,19 +71,6 @@ const getUserById = async (req, res, next) => {
     if (err.kind === 'ObjectId') {
       return next(new ErrorBadRequest('Переданы невалидные данные'));
     }
-    return next(new ErrorServer('Ошибка на сервере'));
-  }
-};
-
-const getUserInfo = async (req, res, next) => {
-  try {
-    const userId = req.user._id;
-    const user = await User.findById(userId);
-    if (!user) {
-      return next(new ErrorNotFound('Указанный пользователь не найден'));
-    }
-    return res.send(user);
-  } catch (err) {
     return next(new ErrorServer('Ошибка на сервере'));
   }
 };

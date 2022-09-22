@@ -23,7 +23,7 @@ app.use(userRoutes);
 app.use(cardRoutes);
 
 app.use((req, res, next) => {
-  next(new ErrorNotFound('Страница не найлена'));
+  next(new ErrorNotFound('Страница не найдена'));
 });
 
 app.use(errors());

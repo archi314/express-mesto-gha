@@ -25,7 +25,7 @@ const userSchema = new mongoose.Schema({
     required: [true, 'Поле "avatar" должно быть заполнено'],
     validate: {
       validator(v) {
-        return /^(https?:\/\/)?([\da-z.-]{2, 6})([/\w .-]*)*\/?$/.test(v);
+        return /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\\+~#=]+\.[a-zA-Z0-9()]+([-a-zA-Z0-9()@:%_\\+.~#?&/=#]*)/.test(v);
       },
       message: 'Невалидная ссылка',
     },

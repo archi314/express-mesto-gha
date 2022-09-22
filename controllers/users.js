@@ -6,6 +6,7 @@ const ErrorBadRequest = require('../errors/ErrorBadRequest'); /** Ошбика 4
 const ErrorNotFound = require('../errors/ErrorNotFound'); /** Ошибка 404. */
 const ErrorServer = require('../errors/ErrorServer'); /** Ошибка 500. */
 const ErrorConflict = require('../errors/ErrorConflict'); /** Ошибка 409. */
+const ErrorUnauthorized = require('../errors/ErrorUnauthorized'); /** Ошибка 401. */
 
 const createUser = async (req, res, next) => {
   const {
@@ -117,20 +118,29 @@ const updateUserAvatar = async (req, res, next) => {
 
 const login = async (req, res, next) => {
   const { email, password } = req.body;
-  User.findUserByCredentials(email, password)
-    .then((user) => {
-      const token = jwt.sign(
-        { _id: user._id },
-        'SECRET',
-      );
-      res.cookie('jwt', token, {
-        maxAge: 3600000,
-        httpOnly: true,
-        sameSite: true,
-      });
-      res.send({ token });
-    })
-    .catch(next);
+
+  try {
+    const user = await User.findOne({ email }).selected('+password');
+    if (!user) {
+      return next(new ErrorNotFound('Пользователь c введенным email не существует'));
+    }
+    const coincidedPassword = await bcrypt.compare(password, user.password);
+    if (!coincidedPassword) {
+      return next(new ErrorUnauthorized('Неверно ведена почта или пароль'));
+    }
+    const token = jwt.sign(
+      { _id: user._id },
+      'SECRET',
+    );
+    res.cookie('jwt', token, {
+      maxAge: 3600000,
+      httpOnly: true,
+      sameSite: true,
+    });
+    return res.send(user.toJSON());
+  } catch (err) {
+    return next(err);
+  }
 };
 
 module.exports = {

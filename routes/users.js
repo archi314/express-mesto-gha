@@ -11,6 +11,10 @@ const {
   updateUserAvatar,
 } = require('../controllers/users');
 
+const auth = require('../middlewares/auth');
+
+userRoutes.use(auth);
+
 userRoutes.get('/users', getUsers);
 userRoutes.get('/users/me', getUserInfo);
 

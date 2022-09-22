@@ -3,6 +3,8 @@ const { celebrate, Joi } = require('celebrate');
 
 const userRoutes = express.Router();
 
+const auth = require('../middlewares/auth');
+
 const {
   getUsers,
   getUserById,
@@ -10,6 +12,8 @@ const {
   updateUserProfile,
   updateUserAvatar,
 } = require('../controllers/users');
+
+userRoutes.use(auth);
 
 userRoutes.get('/users', getUsers);
 userRoutes.get('/users/me', getUserInfo);

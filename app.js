@@ -5,7 +5,6 @@ const { errors, celebrate, Joi } = require('celebrate');
 
 const { PORT = 3000 } = process.env;
 
-const auth = require('./middlewares/auth');
 const { createUser, login } = require('./controllers/users');
 const { userRoutes } = require('./routes/users');
 const { cardRoutes } = require('./routes/cards');
@@ -37,8 +36,6 @@ userRoutes.post('/signin', celebrate({
     password: Joi.string().required(),
   }),
 }), login);
-
-app.use(auth);
 
 app.use(userRoutes);
 app.use(cardRoutes);

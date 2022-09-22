@@ -125,7 +125,7 @@ const login = async (req, res, next) => {
       httpOnly: true,
       sameSite: true,
     });
-    return res.send(user);
+    return res.send(user.toJSON());
   } catch (err) {
     return next(err);
   }

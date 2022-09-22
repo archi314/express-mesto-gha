@@ -1,6 +1,5 @@
 const express = require('express');
 const mongoose = require('mongoose');
-const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 
 const { errors } = require('celebrate');
@@ -10,15 +9,13 @@ const { PORT = 3000 } = process.env;
 const { userRoutes } = require('./routes/users');
 const { cardRoutes } = require('./routes/cards');
 
-const auth = require('./middlewares/auth');
-
 const {
   ErrorNotFound, /** Ошибка 404. */
 } = require('./errors/ErrorNotFound');
 
 const app = express();
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+//app.use(bodyParser.json());
+//app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 app.use(express.json());
@@ -30,12 +27,11 @@ app.use((req, res) => {
   res.status(ErrorNotFound).send({ message: 'Страница не найлена' });
 });
 
-app.use(auth);
 app.use(errors());
 
 app.use((err, req, res, next) => {
   const statusCode = err.statusCode || 500;
-  const message = statusCode === 500 ? 'На сервере произошла ошибка' : err.message;
+  const message = statusCode === 500 ? 'Ошибка на сервере' : err.message;
   res.status(statusCode).send({ message });
   next();
 });

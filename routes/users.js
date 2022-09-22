@@ -13,8 +13,6 @@ const {
   login,
 } = require('../controllers/users');
 
-userRoutes.use(auth);
-
 userRoutes.post('/signup', celebrate({
   body: Joi.object().keys({
     name: Joi.string().min(2).max(30).default('Жак-Ив Кусто'),
@@ -33,6 +31,8 @@ userRoutes.post('/signin', celebrate({
     password: Joi.string().required(),
   }),
 }), login);
+
+userRoutes.use(auth);
 
 userRoutes.get('/users', getUsers);
 

@@ -50,7 +50,6 @@ const getUserById = async (req, res, next) => {
   const { userId } = req.params;
   try {
     const user = await User.findById(userId);
-
     if (user) {
       return res.send(user);
     }
@@ -72,9 +71,6 @@ const getUserInfo = async (req, res, next) => {
     }
     return res.send(user);
   } catch (err) {
-    if (err.kind === 'ObjectId') {
-      return next(new ErrorBadRequest('Переданы невалидные данные'));
-    }
     return next(new ErrorServer('Ошибка на сервере'));
   }
 };
@@ -139,6 +135,7 @@ const login = async (req, res, next) => {
     res.cookie('jwt', token, {
       maxAge: 3600000,
       httpOnly: true,
+      sameSite: true,
     });
     return res.send(user.toJSON());
   } catch (err) {

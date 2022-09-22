@@ -122,7 +122,7 @@ const login = async (req, res, next) => {
   try {
     const user = await User.findOne({ email }).selected('+password');
     if (!user) {
-      return next(new ErrorNotFound('Пользователь c введенным email не существует'));
+      return next(new ErrorUnauthorized('Пользователь c введенным email не существует'));
     }
     const coincidedPassword = await bcrypt.compare(password, user.password);
     if (!coincidedPassword) {
@@ -137,7 +137,7 @@ const login = async (req, res, next) => {
       httpOnly: true,
       sameSite: true,
     });
-    return res.send(user.toJSON());
+    return res.send(user);
   } catch (err) {
     return next(err);
   }

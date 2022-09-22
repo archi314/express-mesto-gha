@@ -11,10 +11,6 @@ const {
   dislikeCard,
 } = require('../controllers/cards');
 
-const auth = require('../middlewares/auth');
-
-cardRoutes.use(auth);
-
 cardRoutes.get('/cards', getCards);
 
 cardRoutes.post('/cards', celebrate({

@@ -3,9 +3,7 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const { errors, celebrate, Joi } = require('celebrate');
-
-const { PORT = 3000 } = process.env;
-
+const auth = require('./middlewares/auth');
 const { userRoutes } = require('./routes/users');
 const { cardRoutes } = require('./routes/cards');
 const { createUser, login } = require('./controllers/users');
@@ -13,6 +11,8 @@ const { createUser, login } = require('./controllers/users');
 const {
   ErrorNotFound, /** Ошибка 404. */
 } = require('./errors/ErrorNotFound');
+
+const { PORT = 3000 } = process.env;
 
 const app = express();
 app.use(bodyParser.json());
@@ -40,10 +40,12 @@ userRoutes.post('/signin', celebrate({
   }),
 }), login);
 
+app.use(auth);
+
 app.use(userRoutes);
 app.use(cardRoutes);
 
-app.use((req, res, next) => {
+app.use('*', (req, res, next) => {
   next(new ErrorNotFound('Страница не найлена'));
 });
 

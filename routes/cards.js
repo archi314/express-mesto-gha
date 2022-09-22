@@ -3,8 +3,6 @@ const { celebrate, Joi } = require('celebrate');
 
 const cardRoutes = express.Router();
 
-const auth = require('../middlewares/auth');
-
 const {
   getCards,
   createCard,
@@ -12,8 +10,6 @@ const {
   likeCard,
   dislikeCard,
 } = require('../controllers/cards');
-
-cardRoutes.use(auth);
 
 cardRoutes.get('/cards', getCards);
 

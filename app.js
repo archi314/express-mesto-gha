@@ -14,8 +14,6 @@ const {
 } = require('./errors/ErrorNotFound');
 
 const app = express();
-//app.use(bodyParser.json());
-//app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 app.use(express.json());
@@ -23,8 +21,8 @@ app.use(express.json());
 app.use(userRoutes);
 app.use(cardRoutes);
 
-app.use((req, res) => {
-  res.status(ErrorNotFound).send({ message: 'Страница не найлена' });
+app.use((req, res, next) => {
+  next(ErrorNotFound('Страница не найлена'));
 });
 
 app.use(errors());

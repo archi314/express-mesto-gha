@@ -32,8 +32,6 @@ userRoutes.post('/signin', celebrate({
   }),
 }), login);
 
-userRoutes.use(auth);
-
 userRoutes.get('/users', getUsers);
 
 userRoutes.get('/users/:userId', celebrate({
@@ -54,6 +52,8 @@ userRoutes.patch('/users/me/avatar', celebrate({
     avatar: Joi.string().regex(/^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w .-]*)*\/?$/),
   }),
 }), updateUserAvatar);
+
+userRoutes.use(auth);
 
 module.exports = {
   userRoutes,

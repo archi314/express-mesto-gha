@@ -6,11 +6,13 @@ const userRoutes = express.Router();
 const {
   getUsers,
   getUserById,
+  getUserInfo,
   updateUserProfile,
   updateUserAvatar,
 } = require('../controllers/users');
 
 userRoutes.get('/users', getUsers);
+userRoutes.get('/users/me', getUserInfo);
 
 userRoutes.get('/users/:userId', celebrate({
   params: Joi.object().keys({

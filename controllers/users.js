@@ -63,6 +63,22 @@ const getUserById = async (req, res, next) => {
   }
 };
 
+const getUserInfo = async (req, res, next) => {
+  try {
+    const userId = req.user._id;
+    const user = await User.findById(userId);
+    if (!user) {
+      return next(new ErrorNotFound('Указанный пользователь не найден'));
+    }
+    return res.send(user);
+  } catch (err) {
+    if (err.kind === 'ObjectId') {
+      return next(new ErrorBadRequest('Переданы невалидные данные'));
+    }
+    return next(new ErrorServer('Ошибка на сервере'));
+  }
+};
+
 const updateUserProfile = async (req, res, next) => {
   const { name, about } = req.body;
   const owner = req.user._id;
@@ -135,6 +151,7 @@ module.exports = {
   createUser,
   getUsers,
   getUserById,
+  getUserInfo,
   updateUserProfile,
   updateUserAvatar,
   login,

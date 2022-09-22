@@ -38,7 +38,7 @@ userRoutes.post('/signin', celebrate({
   }),
 }), login);
 
-userRoutes.use(auth);
+app.use(auth);
 
 app.use(userRoutes);
 app.use(cardRoutes);

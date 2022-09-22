@@ -1,36 +1,14 @@
 const express = require('express');
 const { celebrate, Joi } = require('celebrate');
-const auth = require('../middlewares/auth');
 
 const userRoutes = express.Router();
 
 const {
-  createUser,
   getUsers,
   getUserById,
   updateUserProfile,
   updateUserAvatar,
-  login,
 } = require('../controllers/users');
-
-userRoutes.post('/signup', celebrate({
-  body: Joi.object().keys({
-    name: Joi.string().min(2).max(30).default('Жак-Ив Кусто'),
-    about: Joi.string().min(2).max(30).default('Исследователь'),
-    avatar: Joi.string()
-      .regex(/^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w .-]*)*\/?$/)
-      .default('https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png'),
-    email: Joi.string().required().email(),
-    password: Joi.string().required(),
-  }),
-}), createUser);
-
-userRoutes.post('/signin', celebrate({
-  body: Joi.object().keys({
-    email: Joi.string().required().email(),
-    password: Joi.string().required(),
-  }),
-}), login);
 
 userRoutes.get('/users', getUsers);
 
@@ -52,8 +30,6 @@ userRoutes.patch('/users/me/avatar', celebrate({
     avatar: Joi.string().regex(/^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w .-]*)*\/?$/),
   }),
 }), updateUserAvatar);
-
-userRoutes.use(auth);
 
 module.exports = {
   userRoutes,

@@ -1,6 +1,5 @@
 const express = require('express');
 const mongoose = require('mongoose');
-const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const { errors, celebrate, Joi } = require('celebrate');
 const auth = require('./middlewares/auth');
@@ -15,8 +14,6 @@ const {
 const { PORT = 3000 } = process.env;
 
 const app = express();
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 app.use(express.json());
@@ -40,7 +37,8 @@ userRoutes.post('/signin', celebrate({
   }),
 }), login);
 
-app.use(auth);
+userRoutes.use(auth);
+cardRoutes.use(auth);
 
 app.use(userRoutes);
 app.use(cardRoutes);

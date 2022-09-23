@@ -6,7 +6,7 @@ const { errors } = require('celebrate');
 const { userRoutes } = require('./routes/users');
 const { cardRoutes } = require('./routes/cards');
 
-const { ErrorNotFound } = require('./errors/ErrorNotFound'); /** Ошибка 404. */
+const ErrorNotFound = require('./errors/ErrorNotFound'); /** Ошибка 404. */
 
 const { PORT = 3000 } = process.env;
 

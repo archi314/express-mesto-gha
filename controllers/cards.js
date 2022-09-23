@@ -3,7 +3,7 @@ const Card = require('../models/card');
 const ErrorBadRequest = require('../errors/ErrorBadRequest'); /** Ошбика 400. */
 const ErrorNotFound = require('../errors/ErrorNotFound'); /** Ошибка 404. */
 const ErrorServer = require('../errors/ErrorServer'); /** Ошибка 500. */
-const ErrorConflict = require('../errors/ErrorConflict'); /** Ошибка 409. */
+const ErrorForbidden = require('../errors/ErrorForbidden'); /** Ошибка 409. */
 
 const getCards = async (req, res, next) => {
   try {
@@ -37,7 +37,7 @@ const deleteCard = async (req, res, next) => {
       return next(new ErrorNotFound('Указанной карточки не существует'));
     }
     if (owner !== card.owner.toString()) {
-      return next(new ErrorConflict('Вы не можете удалить чужую карточку'));
+      return next(new ErrorForbidden('Вы не можете удалить чужую карточку'));
     }
     await Card.findByIdAndRemove(cardId);
     return res.send({ message: 'Карточка удалена' });

@@ -1,5 +1,13 @@
 const express = require('express');
 const { celebrate, Joi } = require('celebrate');
+const validator = require('validator');
+
+const method = (value) => {
+  const result = validator.isURL(value);
+  if (result) {
+    return value;
+  } throw new Error('URL validation err');
+};
 
 const userRoutes = express.Router();
 
@@ -20,7 +28,7 @@ userRoutes.post('/signup', celebrate({
     name: Joi.string().min(2).max(30).default('Жак-Ив Кусто'),
     about: Joi.string().min(2).max(30).default('Исследователь'),
     avatar: Joi.string()
-      .regex(/^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w .-]*)*\/?$/)
+      .custom(method)
       .default('https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png'),
     email: Joi.string().required().email(),
     password: Joi.string().required(),
@@ -54,9 +62,7 @@ userRoutes.patch('/users/me', celebrate({
 
 userRoutes.patch('/users/me/avatar', celebrate({
   body: Joi.object().keys({
-    avatar: Joi.string().required().pattern(
-      /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\\+~#=]+\.[a-zA-Z0-9()]+([-a-zA-Z0-9()@:%_\\+.~#?&/=#]*)/,
-    ),
+    avatar: Joi.string().required().custom(method),
   }),
 }), updateUserAvatar);
 

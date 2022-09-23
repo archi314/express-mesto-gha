@@ -1,5 +1,13 @@
 const express = require('express');
 const { celebrate, Joi } = require('celebrate');
+const validator = require('validator');
+
+const method = (value) => {
+  const result = validator.isURL(value);
+  if (result) {
+    return value;
+  } throw new Error('URL validation err');
+};
 
 const cardRoutes = express.Router();
 
@@ -14,9 +22,7 @@ const {
 cardRoutes.post('/cards', celebrate({
   body: Joi.object().keys({
     name: Joi.string().required().min(2).max(30),
-    link: Joi.string().required().pattern(
-      /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\\+~#=]+\.[a-zA-Z0-9()]+([-a-zA-Z0-9()@:%_\\+.~#?&/=#]*)/,
-    ),
+    link: Joi.string().required().custom(method),
   }),
 }), createCard);
 

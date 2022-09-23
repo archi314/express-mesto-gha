@@ -85,7 +85,7 @@ const updateUserProfile = async (req, res, next) => {
       { new: true, runValidators: true },
     );
     if (!user) {
-      return next(new ErrorNotFound('Указанный ваемый пользователь не найден'));
+      return next(new ErrorNotFound('Указанный пользователь не найден'));
     }
     return res.send(user);
   } catch (err) {
@@ -116,33 +116,31 @@ const updateUserAvatar = async (req, res, next) => {
   }
 };
 
-const login = (req, res, next) => {
+const login = async (req, res, next) => {
   const { email, password } = req.body;
 
-  if (!email || !password) {
-    next(new ErrorUnauthorized('Неверно ведена почта или пароль'));
-  }
-  User.findOne({ email })
-    .select('+password')
-    .orFail(() => new ErrorNotFound('Пользователь не найден'))
-    .then((user) => {
-      bcrypt.compare(password, user.password)
-        .then((isUserValid) => {
-          if (isUserValid) {
-            const token = jwt.sign(
-              { _id: user._id },
-              'SECRET',
-            );
-            res.cookie('jwt', token, {
-              maxAge: 3600000,
-              httpOnly: true,
-              sameSite: true,
-            });
-            return res.send(user.toJSON());
-          }
-          return next(new ErrorUnauthorized('Неверно ведена почта или пароль'));
-        });
+  try {
+    const user = await User.findOne({ email }).select('+password');
+    if (!user) {
+      return next(new ErrorUnauthorized('Неверно ведена почта или пароль'));
+    }
+    const userValid = await bcrypt.compare(password, user.password);
+    if (!userValid) {
+      return next(new ErrorUnauthorized('Неверно ведена почта или пароль'));
+    }
+
+    const token = jwt.sign({
+      _id: user._id,
+    }, 'SECRET');
+    res.cookie('jwt', token, {
+      maxAge: 3600000,
+      httpOnly: true,
+      sameSite: true,
     });
+    return res.status(200).send(user.toJSON());
+  } catch (error) {
+    return next(new ErrorServer('Ошибка на сервере'));
+  }
 };
 
 module.exports = {

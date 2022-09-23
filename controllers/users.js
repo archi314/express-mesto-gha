@@ -138,10 +138,9 @@ const login = (req, res, next) => {
               httpOnly: true,
               sameSite: true,
             });
-            res.send(user.toJSON());
-          } else {
-            return next(new ErrorUnauthorized('Неверно ведена почта или пароль'));
+            return res.send(user.toJSON());
           }
+          return next(new ErrorUnauthorized('Неверно ведена почта или пароль'));
         });
     });
 };

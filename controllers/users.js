@@ -116,31 +116,28 @@ const updateUserAvatar = async (req, res, next) => {
   }
 };
 
-const login = async (req, res, next) => {
+const login = (req, res, next) => {
   const { email, password } = req.body;
 
-  try {
-    const user = await User.findOne({ email }).selected('+password');
-    if (!user) {
-      return next(new ErrorUnauthorized('Пользователь c введенным email не существует'));
-    }
-    const coincidedPassword = await bcrypt.compare(password, user.password);
-    if (!coincidedPassword) {
-      return next(new ErrorUnauthorized('Неверно ведена почта или пароль'));
-    }
-    const token = jwt.sign(
-      { _id: user._id },
-      'SECRET',
-    );
-    res.cookie('jwt', token, {
-      maxAge: 3600000,
-      httpOnly: true,
-      sameSite: true,
-    });
-    return res.send(user);
-  } catch (err) {
-    return next(err);
+  if (!email || !password) {
+    next(new ErrorUnauthorized('Пароль и email обязательны!'));
   }
+  User.findUserByCredentials(email, password)
+    .then((user) => {
+      const token = jwt.sign(
+        { _id: user._id },
+        'SECRET',
+        {
+          maxAge: 3600000,
+          httpOnly: true,
+          sameSite: true,
+        },
+      );
+      return res.send({ token });
+    })
+    .catch((err) => {
+      next(err);
+    });
 };
 
 module.exports = {

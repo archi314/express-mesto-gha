@@ -3,7 +3,7 @@ const Card = require('../models/card');
 const ErrorBadRequest = require('../errors/ErrorBadRequest'); /** Ошбика 400. */
 const ErrorNotFound = require('../errors/ErrorNotFound'); /** Ошибка 404. */
 const ErrorServer = require('../errors/ErrorServer'); /** Ошибка 500. */
-const ErrorForbidden = require('../errors/ErrorForbidden'); /** Ошибка 409. */
+const ErrorForbidden = require('../errors/ErrorForbidden'); /** Ошибка 403. */
 
 const getCards = async (req, res, next) => {
   try {

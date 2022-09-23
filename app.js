@@ -6,9 +6,7 @@ const { errors } = require('celebrate');
 const { userRoutes } = require('./routes/users');
 const { cardRoutes } = require('./routes/cards');
 
-const {
-  ErrorNotFound, /** Ошибка 404. */
-} = require('./errors/ErrorNotFound');
+const { ErrorNotFound } = require('./errors/ErrorNotFound'); /** Ошибка 404. */
 
 const { PORT = 3000 } = process.env;
 
@@ -22,7 +20,7 @@ app.use(express.json());
 app.use(userRoutes);
 app.use(cardRoutes);
 
-app.use((req, res, next) => {
+app.use('*', (req, res, next) => {
   next(new ErrorNotFound('Страница не найдена'));
 });
 

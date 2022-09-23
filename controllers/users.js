@@ -120,23 +120,29 @@ const login = (req, res, next) => {
   const { email, password } = req.body;
 
   if (!email || !password) {
-    next(new ErrorUnauthorized('Пароль и email обязательны!'));
+    next(new ErrorUnauthorized('Неверно ведена почта или пароль'));
   }
-  User.findUserByCredentials(email, password)
+  User.findOne({ email })
+    .select('+password')
+    .orFail(() => new ErrorNotFound('Пользователь не найден'))
     .then((user) => {
-      const token = jwt.sign(
-        { _id: user._id },
-        'SECRET',
-        {
-          maxAge: 3600000,
-          httpOnly: true,
-          sameSite: true,
-        },
-      );
-      return res.send({ token });
-    })
-    .catch((err) => {
-      next(err);
+      bcrypt.compare(password, user.password)
+        .then((isUserValid) => {
+          if (isUserValid) {
+            const token = jwt.sign(
+              { _id: user._id },
+              'SECRET',
+            );
+            res.cookie('jwt', token, {
+              maxAge: 3600000,
+              httpOnly: true,
+              sameSite: true,
+            });
+            res.send(user.toJSON());
+          } else {
+            return next(new ErrorUnauthorized('Неверно ведена почта или пароль'));
+          }
+        });
     });
 };
 

@@ -12,5 +12,6 @@
 
 ## Запуск проекта
 
-`npm run start` — запускает сервер   
-`npm run dev` — запускает сервер с hot-reload
+* git clone https://github.com/archi314/express-mesto-gha.git
+* `npm run start` — запускает сервер   
+* `npm run dev` — запускает сервер с hot-reload
